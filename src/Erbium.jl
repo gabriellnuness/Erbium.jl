@@ -1,5 +1,7 @@
 module Erbium
 
-greet() = print("Hello World!")
+export basic_sum
+
+include("functions.jl")
 
 end # module Erbium
