@@ -3,5 +3,11 @@ uuid = "94af3218-a062-4905-b6cb-576bc736053d"
 authors = ["Gabriel Nunes <nunesgfs@gmail.com>"]
 version = "0.1.0"
 
-[deps]
+[compat]
+julia = "1"
+
+[extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
