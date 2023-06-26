@@ -1,7 +1,10 @@
 module Erbium
 
-export basic_sum
+export dJpump_dz
+export dJ_dz
+export optical_fiber
 
-include("functions.jl")
+include("rate_equations.jl")
+include("optical_fiber.jl")
 
 end # module Erbium
