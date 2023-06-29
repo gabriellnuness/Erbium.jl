@@ -1,10 +1,18 @@
-using DelimitedFiles
+# using DelimitedFiles
 
 """
 Set constants according to chosen optical fiber.
+(β_abs, β_emis, τ21, τ3, diameter, NA, total_population) = optical_fiber(fiber)
 
-### Arguments
-`fiber::String`: optical fiber model can be `m5` or `m12`.
+#parameters:
+* `fiber`: optical fiber model `String` can be `m5` or `m12`.
+
+#returns:
+* `β_abs`, `β_emis`:        Absorption and emission spectrum provided by manufacturer or from experiment.
+* `τ21`, `τ3`:              Life time of erbium levels.
+* `diameter`:             Optical mode diameter. 
+* `NA`:                   Numerical aperture.
+* `total_population`:     Ions population in 1/m³
 """
 function optical_fiber(fiber::String)
 
@@ -15,17 +23,14 @@ function optical_fiber(fiber::String)
         β_abs = readdlm("data\\M5_abs.txt",',')
         β_emis = readdlm("data\\M5_emis.txt",',')
         
-        diameter = (5.7+6.6) / 2
-        # sigma_p_a = 
-        # sigma_p_e = 
-        # sigma_a = 
-        # sigma_e = 
-        # N2 = 
-        # NT = 
-        τ21 = 1e-6
-        τ3 = 10e-3
+        diameter = ((5.7+6.6) / 2 )*1e-6
+        total_population = 2.84e24
+        NA = 0.24
+        τ21 = 10e-3
+        τ3 = 1e-6
+        η = 0.1 # fluorescence efficience
 
-        (β_abs, β_emis, τ21, τ3, diameter)
+       return (β_abs, β_emis, τ21, τ3, diameter, NA, total_population, η)
 
     elseif fiber == "m12"
     
@@ -41,8 +46,12 @@ function optical_fiber(fiber::String)
         β_abs = readdlm("data\\M12_abs.txt",',')
         β_emis = readdlm("data\\M12_emis.txt",',')
     
-        (β_abs, β_emis, τ21, τ3, diameter)
+        return (β_abs, β_emis, τ21, τ3, diameter)
+    
+    else
+        throw(error("Fiber model not found."))
     end
+
 
 end
 
@@ -56,7 +65,7 @@ where ω₀ is the Gaussian linewidth of the distribution.
 ### Arguments
 - `λ`: Wavelength
 """
-function Γ(λ)
+function Γ(λ::Float32)
     w = 0.66*λ # ?
     a = 1 # ?
     1-exp(-2*(a/w)^2) # should it be 0.66?
@@ -68,7 +77,7 @@ Photon intensity
 
 g(λ) represents the σₑ, spectrum of spontaneous emission.
 """
-function p(λ)
+function p(λ::Float32)
     g = λ*1 # import emission spectrum here
     NA = 0.225  # numerical apperture optical fiber
     h*v*g*η/2*(1-(1-NA^2)^(1/2))
