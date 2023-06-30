@@ -1,9 +1,14 @@
 module Erbium
 
-export dJpump_dz
-export dJ_dz
+# local functions
 export optical_fiber
+export generate_gaussian_spectrum
+export dIdz
+export dIpdz
 
+# 3rd party package functions
+export linear_interpolation
+export trapz
 
 using DelimitedFiles
 using Interpolations

@@ -1,18 +1,17 @@
 using Erbium
-using Test
 using PyPlot
-using DelimitedFiles
-using Interpolations
-using Trapz
+
 
 # Constants  
 h = 6.6e-34
 c = 299792458
+Γ = 0.66   # optical fiber fill factor
+fiber_loss = 0.0014    #  optical fiber loss in 1/m  
 
 # Input data
 λ_intervals = 100
 z_intervals = 200
-iter_intervals = 500
+iter_intervals = 200
 tol = 1e-3
 λ1 = 1450e-9
 λ2 = 1620e-9
@@ -42,15 +41,16 @@ pump_power = 500e-3
 ω0 = fiber_diameter/3
 area = π*ω0^2
 pump_intensity_peak = 2*pump_power/area
-λc_pump = 980e-9
-Δλ_pump = 5e-9
+λc_pump = 974.4e-9
+Δλ_pump = 2e-9
 λ1_pump = 950e-9
 λ2_pump = 1020e-9
 dλ_pump = (λ2_pump-λ1_pump)/λ_intervals
+λ_pump = range(start=λ1_pump, stop=λ2_pump, step=dλ_pump)
+I_pump = generate_gaussian_spectrum(λ_pump, λc_pump, Δλ_pump, pump_intensity_peak)
 
 
 # Initializing variables
-λ_pump = range(start=λ1_pump, stop=λ2_pump, step=dλ_pump)
 λ = range(start=λ1, stop=λ2, step=dλ)
 z = range(start=0, stop=z_intervals*dz, step=dz)
 n2 = zeros(z_intervals+1)
@@ -66,11 +66,7 @@ I_pump_backward = zeros(λ_intervals+1,z_intervals+1)
 β_abs_pump_interp = linear_interpolation(β_abs_pump[:,1], β_abs_pump[:,2])
 β_emis_pump_interp = linear_interpolation(β_emis_pump[:,1], β_emis_pump[:,2])
 
-
 # Defining spectral densities
-Γ = 0.66   # optical fiber fill factor
-fiber_loss = 0.0014    #  optical fiber loss in 1/m  
-
 
 convert_db_per_m_to_linear = log(10)/10
 β_abs = convert_db_per_m_to_linear *  β_abs_interp.(λ*1e9)
@@ -78,33 +74,25 @@ convert_db_per_m_to_linear = log(10)/10
 β_abs_pump = convert_db_per_m_to_linear * β_abs_pump_interp.(λ_pump*1e9)
 g = β_emis ./ trapz(λ, β_emis) # ∫g(λ)⋅dλ = 1
 
-I_pump = @.  √(2/π) * pump_intensity_peak / dλ_pump * 
-    exp(-(((λ_pump-λc_pump) / Δλ_pump)^2)) # Gaussiana distribution
 
-    figure()
-    plot(β_abs0[:,1], β_abs0[:,2],"o")
-    plot(β_emis0[:,1], β_emis0[:,2],"o")
-    plot(λ*1e9, β_abs,".")
-    plot(λ*1e9, β_emis,".")
-    plot(λ_pump*1e9, β_abs_pump,".")
-
-    
+figure()
+plot(λ*1e9, β_abs)
+plot(λ_pump*1e9, β_abs_pump, color="tab:blue",label="_nolegend_")
+plot(λ*1e9, β_emis)
+plot(λ_pump*1e9, I_pump./maximum(I_pump), color="tab:red")
+    legend(["Absorption", "Emission", "Pump"])
 
 
 
 
 
 
-"""Differential equation solver"""
-dIdz(I,Γ,β_abs,n2,β_emis,fiber_loss,Rho) = I * (-Γ*β_abs*(1-n2) + Γ*β_emis*n2 - fiber_loss) + Rho*n2
-dIpdz(I,Γ,β_abs_pump,n2,β_emis_pump,fiber_loss) = I * (-Γ*β_abs_pump*(1-n2) + Γ*β_emis_pump*n2 - fiber_loss)
-
-Refa = 1
-Refb = 1
+conv1 = 1
+conv2 = 1
 conv = ones(iter_intervals)
 for k = 1:iter_intervals
 
-    #  direction --->
+    # direction --->
     # initial conditions
     for i = 1:λ_intervals+1
         I_pump_forward[i,1] = I_pump[i] + reflect_begin*I_pump_backward[i,1]
@@ -124,10 +112,14 @@ for k = 1:iter_intervals
     end
     
     for j = 1:z_intervals+1
+    # calculate n2 for every z
         wp = 0
         wa = 0
         we = 0
         for i = 1:λ_intervals+1
+        # calculate W = ∫σ⋅I/(hν)dλ 
+        # W = (1/NT) ⋅ ∫β⋅I⋅λ/(hc)dλ 
+        # W = (1/NT) ⋅ ∫β⋅(If+Ib)⋅λ/(hc)dλ
             wp = wp + Γ*(I_pump_forward[i,j]+I_pump_backward[i,j])*λ_pump[i]/(h*c)*β_abs_pump[i]*(1-n2[j]) * dλ_pump/total_population
             wa = wa + Γ*(I_forward[i,j]+I_backward[i,j])*λ[i]/(h*c)*β_abs[i]*(1-n2[j]) * dλ/total_population
             we = we + Γ*(I_forward[i,j]+I_backward[i,j])*λ[i]/(h*c)*β_emis[i]*(1-n2[j]) * dλ/total_population
@@ -194,19 +186,19 @@ for k = 1:iter_intervals
 
     # Checking convergence
     println("iteration: $k")
-    Refb = maximum(I_forward)
-    conv[k+1] = (abs((Refb-Refa)/Refa) )
+    conv2 = maximum(I_forward)
+    conv[k+1] = (abs((conv2-conv1)/conv1) )
     if conv[k+1] > 10
         conv[k+1] = 10
     end
 
     println("convergence: $(conv[k+1])")
     if k > 3
-        if conv[k] < tol && conv[k+1] < tol
+        if conv[k-1]<tol && conv[k]<tol && conv[k+1]<tol
             break
         end
     end     
-    Refa = Refb
+    conv1 = conv2
 
 end
 
@@ -215,4 +207,7 @@ end
 figure()
 plot(λ*1e9, I_forward[:,end])
 plot(λ*1e9, I_backward[:,1])
-yscale("log")
+    xlabel("Wavelength [nm]")
+    ylabel("Intensity [W/m²]")
+    yscale("log")
+

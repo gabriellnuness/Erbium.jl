@@ -53,6 +53,16 @@ end
 
 
 """
+Generate gaussian spectrum in order to represent the pump
+"""
+function generate_gaussian_spectrum(λ, λc, Δλ, I_peak)
+    dλ = λ[2]-λ[1]
+    I_pump = @.  √(2/π)*I_peak/dλ*exp(-(((λ-λc)/Δλ)^2))
+
+    return I_pump
+end
+
+"""
 Distribution of intensity inside optical fiber
 
 Calculated so that the optical fiber diameter is to 3ω₀, 
