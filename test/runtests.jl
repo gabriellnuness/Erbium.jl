@@ -5,13 +5,12 @@ using DelimitedFiles
 using Interpolations
 using Trapz
 
-# @testset "Spectrum simulation 980nm pump" begin
+@testset "Spectrum simulation 980nm pump" begin
 
 
     # Constantes  
     h = 6.6e-34;
     c = 299792458;
-    kB = 1.38e-23;
 
     # Input data
     λ_intervals = 100
@@ -104,13 +103,11 @@ using Trapz
 
 
     """Differential equation solver"""
-
     dIdz(I,Γ,β_abs,n2,β_emis,gamma,Rho) = I*(-Γ*β_abs*(1-n2)+Γ*β_emis*n2-gamma)+Rho*n2;
     dIpdz(I,Γ,β_abs_pump,n2,β_emis_pump,gamma) = I*(-Γ*β_abs_pump*(1-n2)+Γ*β_emis_pump*n2-gamma);
 
     Refa = 1
     Refb = 1
-
     conv = ones(iter_intervals)
     for k = 1:iter_intervals
 
@@ -134,9 +131,7 @@ using Trapz
         end
         
         for j = 1:z_intervals+1
-            wp=0
-            wa=0
-            we=0
+            wp=0; wa=0; we=0
             for i=1:λ_intervals+1
                 wp=wp+Γ*(I_pump_forward[i,j]+I_pump_backward[i,j])*λ_pump[i]/(h*c)*β_abs_pump[i]*(1-n2[j])*dλ_pump/total_population
                 wa=wa+Γ*(I_forward[i,j]+I_backward[i,j])*λ[i]/(h*c)*β_abs[i]*(1-n2[j])*dλ/total_population
@@ -176,30 +171,31 @@ using Trapz
         end
     
         for j=1:z_intervals+1
-            wp=0
-            wa=0
-            we=0
+            wp=0; wa=0; we=0
             for i=1:λ_intervals+1
                 wp = wp + Γ*(I_pump_forward[i,j]+I_pump_backward[i,j])*λ_pump[i]/(h*c)*β_abs_pump[i]*(1 - n2[j])*dλ_pump/total_population
                 wa = wa + Γ*(I_forward[i,j]+I_backward[i,j])*λ[i]/(h*c)*β_abs[i]*(1 - n2[j])*dλ/total_population
                 we = we + Γ*(I_forward[i,j]+I_backward[i,j])*λ[i]/(h*c)*β_emis[i]*(1 - n2[j])*dλ/total_population
             end # i
-            n2[j]=(wp+wa)*τ21/((wp+wa+we)*τ21+1)
+            n2[j] = (wp+wa)*τ21 / ((wp+wa+we)*τ21+1)
         end
     
-        for j=1:z_intervals    
+        for j = 1:z_intervals    
                 jj=z_intervals+1-j
                 for i=1:λ_intervals+1
                     # rdIdz(Int,Γ,β_abs,n2,β_emis,gamma,rho,τ21)
                     Rho=h*c/λ[i]*g[i]*η*0.5*(1-(1-NA^2)^(1/2))*total_population/τ21
-                    fp1 = dIdz(I_backward[i,jj],Γ,β_abs[i],n2[jj],β_emis[i],gamma,Rho)*dz
-                    fp2 = dIdz(I_backward[i,jj]+fp1/2,Γ,β_abs[i],n2[jj],β_emis[i],gamma,Rho)*dz
-                    fp3 = dIdz(I_backward[i,jj]+fp2/2,Γ,β_abs[i],n2[jj],β_emis[i],gamma,Rho)*dz
-                    fp4 = dIdz(I_backward[i,jj]+fp3,Γ,β_abs[i],n2[jj],β_emis[i],gamma,Rho)*dz
+                    fp1 = dIdz(I_backward[i,jj], Γ,β_abs[i],n2[jj],β_emis[i],gamma,Rho) * dz
+                    fp2 = dIdz(I_backward[i,jj]+fp1/2, Γ,β_abs[i],n2[jj],β_emis[i],gamma,Rho) * dz
+                    fp3 = dIdz(I_backward[i,jj]+fp2/2, Γ,β_abs[i],n2[jj],β_emis[i],gamma,Rho) * dz
+                    fp4 = dIdz(I_backward[i,jj]+fp3, Γ,β_abs[i],n2[jj],β_emis[i],gamma,Rho) * dz
                     I_backward[i,jj]=I_backward[i,jj+1]+(fp1 + 2*fp2 + 2*fp3 + fp4)/6
                 end
         end # j     
 
+
+
+        # Checking convergence
         println("iteration: $k")
         Refb = maximum(I_forward)
         conv[k+1] = (abs((Refb-Refa)/Refa) )
@@ -215,28 +211,6 @@ using Trapz
         end     
         Refa = Refb
 
-        # figure(1)
-        # subplot(221)
-        # plot(λ*1e9,I_forward(:,z_intervals+1),λ*1e9,I_backward(:,1))
-        # xlabel("Lambda  (nm)  ")
-        # ylabel("Int. Forw. -   Int. Backw ")
-
-        # subplot(222)
-        # plot(z,n2,z,max(I_pump_forward)/max(max(I_pump_forward)))
-        # axis([0 L 0 1])
-        # xlabel(" z (m) ")
-        # ylabel("Azul = n2         Verm = Ip")
-
-        # subplot(223)
-        # semilogy(λ*1e9,I_forward(:,z_intervals+1),λ*1e9,I_backward(:,1))
-        # xlabel("Lambda  (nm)  ")
-        # ylabel("Int. Forw. -   Int. Backw ")
-
-        # subplot(224)
-        # semilogy(conv,"+b")
-        # semilogy(conv)
-        # xlabel("Fator de convergência x N iterações ")
-
     end
 
 
@@ -246,4 +220,4 @@ using Trapz
     plot(λ*1e9, I_backward[:,1])
     yscale("log")
 
-# end
+end
