@@ -6,13 +6,13 @@ This function takes into consideration the double-peaked shape of the
 erbium broadband emission. The 3-dB FWHM won't work in this case, so the
 appropriate definition is weighted by the square of the power.
 
-#arguments:
+# arguments:
 - `[λ]` and `[y]`: vectors of λ and y.
 
-#returns:
+# returns:
 - `Δλ`: bandwidth value.
 
-#ref:
+# ref:
 Falquier, D. G.; 2000. Stanford.
 """
 function bandwidth(λ,y)
@@ -36,13 +36,13 @@ end
 
 Calculates the mean wavelength of a spectrum.
 
-#arguments:
+# arguments:
 - `[λ]` and `[y]`: vectors of λ and y.
 
-#returns:
+# returns:
 - `λ_mean`: mean wavelength value.
 
-#ref:
+# ref:
 Falquier, D. G.; 2000. Stanford.
 """
 function mean_wavelength(λ,y)
@@ -65,13 +65,13 @@ power = spectrum_power(λ,y)
 
 Calculates the integrated power of an spectrum.
 
-#arguments:
+# arguments:
 - `[λ]` and `[y]`: vectors of λ and y.
 
-#returns:
+# returns:
 - `λ_mean`: mean wavelength value.
 
-#obs:
+# warnings:
 - Normalize the optical spectrum power to 1 nm resolution 
 before using as the function arguments 
 
@@ -95,11 +95,11 @@ normalized_power = normalize_spectrum(λ, y)
 Normalization of spectrum from Advantest Optical Spectrum Analizer.
 The OSA provides the ∫P⋅dλ, where dλ is the OSA resolution for that measurement.
 
-#arguments:
+# arguments:
 - power [dBm]
 - λ     [m]
 
-#returns:
+# returns:
 - normalized spectrum [dBm]
 
 """           

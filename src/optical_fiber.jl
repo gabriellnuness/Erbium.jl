@@ -2,10 +2,10 @@
 Set constants according to chosen optical fiber.
 (β_abs, β_emis, τ21, τ3, diameter, NA, total_population, η) = optical_fiber(fiber)
 
-#parameters:
+# arguments:
 * `fiber`: optical fiber model `String` can be `m5` or `m12`.
 
-#returns:
+# returns:
 * `β_abs`, `β_emis`:        Absorption and emission spectrum provided by manufacturer or from experiment.
 * `τ21`, `τ3`:              Life time of erbium levels.
 * `diameter`:               Optical mode diameter. 
