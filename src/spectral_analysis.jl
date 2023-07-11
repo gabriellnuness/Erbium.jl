@@ -110,3 +110,4 @@ function normalize_spectrum(λ, y)
 
     return normalized_power
 end
+#TODO: Implement tests for these functions
