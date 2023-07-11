@@ -92,8 +92,8 @@ end
 """
 normalized_power = normalize_spectrum(λ, y)
 
-Function to normalize spectrum from Advantest Optical Spectrum Analizer.
-The OSA provides the area of power vs. delta lambda
+Normalization of spectrum from Advantest Optical Spectrum Analizer.
+The OSA provides the ∫P⋅dλ, where dλ is the OSA resolution for that measurement.
 
 #arguments:
 - power [dBm]

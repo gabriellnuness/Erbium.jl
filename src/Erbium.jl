@@ -1,10 +1,21 @@
 module Erbium
 
+
 # local functions
+export normalize_spectrum
+export spectrum_power
+export mean_wavelength
+export bandwidth
+
 export optical_fiber
 export generate_gaussian_spectrum
 export dIdz
 export dIpdz
+export dIdz_opt
+export dIpdz_opt
+
+
+
 
 # 3rd party package functions
 export linear_interpolation
@@ -17,6 +28,7 @@ using Trapz
 
 include("rate_equations.jl")
 include("optical_fiber.jl")
+include("spectral_analysis.jl")
 
 
 
