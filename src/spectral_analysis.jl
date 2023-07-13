@@ -40,10 +40,8 @@ function bandwidth(λ, y, ::Type{FWHM}, db_check=nothing)
    
     ymax = maximum(y)
     if db_check == "dB"
-        println("dB")
         y_half = ymax-3 
     elseif isnothing(db_check)
-        println("linear")
         y_half = ymax/2
     end
 
@@ -175,13 +173,11 @@ function normalize_spectrum(λ, y)
 
     dλ = diff(λ)
     normalized_power = y[2:end] ./ dλ
-    println("Resolution from λ vector")
 
     return (λ_norm=λ[2:end], power_norm=normalized_power)
 end
 function normalize_spectrum(λ, y, dλ)
 
-    println("Fixed input resolution")
     normalized_power = y/dλ
 
     return (λ_norm=λ, power_norm=normalized_power)
