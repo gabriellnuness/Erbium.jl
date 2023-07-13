@@ -3,9 +3,6 @@
 Package to simulate the spectrum of  Erbium-doped superfluorescent fiber sources (SFS).
 
 ### Optical fibers of interest:
-- Fibercore M3
-- Fibercore M5
-- Fibercore M12
-- Liekki ER30
+Fibercore M3, M5, M12, and Liekki ER30.
 
 
