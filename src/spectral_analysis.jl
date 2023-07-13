@@ -38,6 +38,7 @@ the full width at half maximum method.
 """
 function bandwidth(λ, y, ::Type{FWHM}, db_check=nothing)
    
+    N =  length(λ)
     ymax = maximum(y)
     if db_check == "dB"
         y_half = ymax-3 
@@ -55,6 +56,10 @@ function bandwidth(λ, y, ::Type{FWHM}, db_check=nothing)
     # then, make a linear fit to find exact λ representing middle point
     if λ₁ ≉  y_half
         ind12 = ind1 - 1
+        if ind12 == 0
+            ind12 = 1
+        end
+
         X = [λ[ind1], λ[ind12]] # 1x2
         Y = [y[ind1], y[ind12]] # 1x2
         A = [[1,1] X]
@@ -66,6 +71,11 @@ function bandwidth(λ, y, ::Type{FWHM}, db_check=nothing)
     end
     if λ₂ ≉  y_half
         ind22 = ind2 + 1
+        if ind22 > N
+            ind22 = N
+        end
+
+
         X = [λ[ind2], λ[ind22]]
         Y = [y[ind2], y[ind22]]
         A = [[1,1] X]
