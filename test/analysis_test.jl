@@ -3,8 +3,7 @@ using PyPlot
 using DelimitedFiles
 
 
-power_ref = 4.74e-3  # reference power measured with power meter
-input = readdlm("data\\example_sld_4_74mw.lvm", ',')
+input = readdlm("data\\example_erbium_4_44mw.lvm", ',')
 power_dbm = input[:,1]
 λ = input[:,2]
 
@@ -20,6 +19,7 @@ total_power = power_spectrum(λ_norm, power_norm)
 
 Δλ = bandwidth(λ_norm, power_norm, Weighted)
 Δλ = bandwidth(λ_norm, power_norm, FWHM)
+Δλ = bandwidth(λ, power_dbm, FWHM, "dB")
 
 
 # normalized plot compared to the original in W

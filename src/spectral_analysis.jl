@@ -1,5 +1,5 @@
 """
-Δλ = bandwidth(λ, y, ::bwMethod)
+Δλ = bandwidth(λ, y, ::bwMethod, db_check)
 
 Function to calculate the spectral bandwidth of a given spectrum given in linear units.
 This function takes into consideration the double-peaked shape of the
@@ -9,6 +9,7 @@ appropriate definition is weighted by the square of the power.
 # arguments:
 - `[λ]` and `[y]`:  vectors of λ and y [linear].
 - `::bwMethod`:     can be `FWHM` or `Weighted`.
+- `db_check`:       calculates with curve in decibel if equals "dB".
 
 # returns:
 - `Δλ`: bandwidth value.
@@ -35,9 +36,17 @@ the full width at half maximum method.
 # returns:
 - `Δλ`: bandwidth value.
 """
-function bandwidth(λ, y, ::Type{FWHM})
+function bandwidth(λ, y, ::Type{FWHM}, db_check=nothing)
+   
+    ymax = maximum(y)
+    if db_check == "dB"
+        println("dB")
+        y_half = ymax-3 
+    elseif isnothing(db_check)
+        println("linear")
+        y_half = ymax/2
+    end
 
-    y_half = maximum(y)/2
     ind1 = findfirst(>=(y_half), y)
     ind2 = findlast(>=(y_half), y)
     λ₁ = λ[ind1]
