@@ -5,8 +5,9 @@ using DelimitedFiles
 using Interpolations
 using Trapz
 
-@testset "Spectrum simulation 980nm pump" begin
+cd("..")
 
+@testset "Spectrum simulation 980nm pump" begin
 
     # Constantes  
     h = 6.6e-34;
