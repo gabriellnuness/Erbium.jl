@@ -7,7 +7,7 @@ using Trapz
 
 cd("..")
 
-@testset "Spectrum simulation 980nm pump" begin
+@testset "Simulation: fiber M5 pumped by 980nm" begin
 
     # Constantes  
     h = 6.6e-34;
@@ -15,17 +15,13 @@ cd("..")
 
     # Input data
     λ_intervals = 100
-    z_intervals = 200
-    iter_intervals = 500
+    z_intervals = 50#200
+    iter_intervals = 200
     tol = 1e-3
     λ1 = 1450e-9
     λ2 = 1620e-9
     dλ = (λ2-λ1)/λ_intervals
     
-
-
-
-
     # Optical fiber info
     fiber = "m5"
     (β_abs0,β_emis0,τ21,τ3,fiber_diameter,NA,total_population,η) = optical_fiber(fiber)
@@ -41,10 +37,6 @@ cd("..")
     β_abs = β_abs0[581:end,:]
     β_emis = β_emis0[581:end,:]
     
-
-
-
-
     # Creating the pump spectrum
     pump_power = 500e-3
     ω0 = fiber_diameter/3
@@ -56,17 +48,15 @@ cd("..")
     λ2_pump = 1020e-9
     dλ_pump = (λ2_pump-λ1_pump)/λ_intervals
 
-
     # Initializing variables
     λ_pump = range(start=λ1_pump, stop=λ2_pump, step=dλ_pump)
     λ = range(start=λ1, stop=λ2, step=dλ)
     z = range(start=0, stop=z_intervals*dz, step=dz)
     n2 = zeros(z_intervals+1)
-    I_forward = zeros(λ_intervals+1,z_intervals+1)
-    I_backward = zeros(λ_intervals+1,z_intervals+1)
-    I_pump_forward = zeros(λ_intervals+1,z_intervals+1)
-    I_pump_backward = zeros(λ_intervals+1,z_intervals+1)
-
+    I_forward = zeros(λ_intervals+1, z_intervals+1)
+    I_backward = zeros(λ_intervals+1, z_intervals+1)
+    I_pump_forward = zeros(λ_intervals+1, z_intervals+1)
+    I_pump_backward = zeros(λ_intervals+1, z_intervals+1)
 
     # interpolate spectra to simulation data
     β_abs_interp = linear_interpolation(β_abs[:,1], β_abs[:,2])
@@ -74,34 +64,24 @@ cd("..")
     β_abs_pump_interp = linear_interpolation(β_abs_pump[:,1], β_abs_pump[:,2])
     β_emis_pump_interp = linear_interpolation(β_emis_pump[:,1], β_emis_pump[:,2])
 
-
     # Defining spectral densities
     Γ = 0.66   # optical fiber fill factor
     gamma = 0.0014    #  optical fiber loss in 1/m  
-
-    
     convert_db_per_m_to_linear = log(10)/10
-    β_abs = convert_db_per_m_to_linear *  β_abs_interp.(λ*1e9)
-    β_emis = convert_db_per_m_to_linear * β_emis_interp.(λ*1e9)
-    β_abs_pump = convert_db_per_m_to_linear * β_abs_pump_interp.(λ_pump*1e9)
-    g = β_emis ./ trapz(λ, β_emis) # ∫g(λ)⋅dλ = 1
+    β_abs = convert_db_per_m_to_linear*β_abs_interp.(λ*1e9)
+    β_emis = convert_db_per_m_to_linear*β_emis_interp.(λ*1e9)
+    β_abs_pump = convert_db_per_m_to_linear*β_abs_pump_interp.(λ_pump*1e9)
+    g = β_emis ./ trapz(λ, β_emis) # ∫g(λ)dλ = 1
 
     I_pump = @.  √(2/π) * pump_intensity_peak / dλ_pump * 
         exp(-(((λ_pump-λc_pump) / Δλ_pump)^2)) # Gaussiana distribution
 
-        figure()
-        plot(β_abs0[:,1], β_abs0[:,2],"o")
-        plot(β_emis0[:,1], β_emis0[:,2],"o")
-        plot(λ*1e9, β_abs,".")
-        plot(λ*1e9, β_emis,".")
-        plot(λ_pump*1e9, β_abs_pump,".")
-    
-        
-
-
-
-
-
+    figure()
+        plot(β_abs0[:,1], β_abs0[:,2])#,"o")
+        plot(β_emis0[:,1], β_emis0[:,2])#,"o")
+        plot(λ*1e9, β_abs)#,".")
+        plot(λ*1e9, β_emis)#,".")
+        plot(λ_pump*1e9, β_abs_pump)#,".")
 
     """Differential equation solver"""
     dIdz(I,Γ,β_abs,n2,β_emis,gamma,Rho) = I*(-Γ*β_abs*(1-n2)+Γ*β_emis*n2-gamma)+Rho*n2;
@@ -194,8 +174,6 @@ cd("..")
                 end
         end # j     
 
-
-
         # Checking convergence
         println("iteration: $k")
         Refb = maximum(I_forward)
@@ -213,8 +191,6 @@ cd("..")
         Refa = Refb
 
     end
-
-
 
     figure()
     plot(λ*1e9, I_forward[:,end])

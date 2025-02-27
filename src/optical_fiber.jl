@@ -19,8 +19,8 @@ function optical_fiber(fiber::String)
     if fiber == "m5"
         
         # β = σ⋅NT
-        β_abs = readdlm("data\\M5_abs.txt",',')
-        β_emis = readdlm("data\\M5_emis.txt",',')
+        β_abs = readdlm("data/M5_abs.txt",',')
+        β_emis = readdlm("data/M5_emis.txt",',')
         diameter = ((5.7+6.6) / 2 )*1e-6
         total_population = 2.84e24
         NA = 0.24
@@ -32,8 +32,8 @@ function optical_fiber(fiber::String)
 
     elseif fiber == "m12"
     
-        β_abs = readdlm("data\\M12_abs.txt",',')
-        β_emis = readdlm("data\\M12_emis.txt",',')
+        β_abs = readdlm("data/M12_abs.txt",',')
+        β_emis = readdlm("data/M12_emis.txt",',')
         diameter = ((5.5+6.3) / 2)*1e-6
         total_population = 2.84e24
         τ21 = 1e-6

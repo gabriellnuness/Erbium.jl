@@ -1,6 +1,7 @@
 using Erbium
 using PyPlot
-# using BenchmarkTools
+
+
 
 
 # Constants  
@@ -27,19 +28,11 @@ dz = fiber_length/z_intervals
 reflect_end = 0.0
 reflect_begin = 1.0
 
-# separate spectrum in 3 parts
-β_abs_pump = β_abs0[1:580,:]
-β_emis_pump = zeros(size(β_abs_pump))
-β_abs = β_abs0[581:end,:]
-β_emis = β_emis0[581:end,:]
+# separate spectrum
+β_abs = @view β_abs0[581:end,:]
+β_emis = @view β_emis0[581:end,:]
 
-# plotting absorption and emission spectra
-figure()
-    plot(β_abs0[:,1], β_abs0[:,2])#,"o")
-    plot(β_emis0[:,1], β_emis0[:,2])#,"o")
-    plot(λ*1e9, β_abs)#,".")
-    plot(λ*1e9, β_emis)#,".")
-    plot(λ_pump*1e9, β_abs_pump)#,".")
+
 
 
 
@@ -48,7 +41,7 @@ pump_power = 500e-3
 ω0 = fiber_diameter/3
 area = π*ω0^2
 pump_intensity_peak = 2*pump_power/area
-λc_pump = 974.4e-9
+λc_pump = 1480e-9 # 974.4e-9
 Δλ_pump = 2e-9
 λ1_pump = 950e-9
 λ2_pump = 1020e-9
@@ -63,15 +56,11 @@ z = range(start=0, stop=z_intervals*dz, step=dz)
 n2 = zeros(z_intervals+1)
 I_forward = zeros(λ_intervals+1,z_intervals+1)
 I_backward = zeros(λ_intervals+1,z_intervals+1)
-I_pump_forward = zeros(λ_intervals+1,z_intervals+1)
-I_pump_backward = zeros(λ_intervals+1,z_intervals+1)
 
 
 # interpolate spectra to simulation data
 β_abs_interp = linear_interpolation(β_abs[:,1], β_abs[:,2])
 β_emis_interp = linear_interpolation(β_emis[:,1], β_emis[:,2])
-β_abs_pump_interp = linear_interpolation(β_abs_pump[:,1], β_abs_pump[:,2])
-β_emis_pump_interp = linear_interpolation(β_emis_pump[:,1], β_emis_pump[:,2])
 
 # Defining spectral densities
 
@@ -82,19 +71,18 @@ convert_db_per_m_to_linear = log(10)/10
 g = β_emis ./ trapz(λ, β_emis) # ∫g(λ)⋅dλ = 1
 
 
-# figure()
-# plot(λ*1e9, β_abs)
-# plot(λ_pump*1e9, β_abs_pump, color="tab:blue",label="_nolegend_")
-# plot(λ*1e9, β_emis)
-# plot(λ_pump*1e9, I_pump./maximum(I_pump), color="tab:red")
-#     legend(["Absorption", "Emission", "Pump"])
+figure()
+plot(λ*1e9, β_abs)
+plot(λ_pump*1e9, β_abs_pump, color="tab:blue",label="_nolegend_")
+plot(λ*1e9, β_emis)
+plot(λ_pump*1e9, I_pump./maximum(I_pump), color="tab:red")
+    legend(["Absorption", "Emission", "Pump"])
 
 
 
 conv1 = 1
 conv2 = 1
 conv = ones(iter_intervals)
-
 
 @time begin
 
@@ -111,8 +99,6 @@ for k = 1:iter_intervals
 
     for j = 1:z_intervals
         for i = 1:λ_intervals+1
-        # runge kutta!!!
-            # res=dIpdz(Int,Γ,β_abs_pump,n2,β_emis_pump,fiber_loss)
             fp1 = dIpdz(I_pump_forward[i,j],         Γ,β_abs_pump[i],n2[j],β_emis_pump[i],fiber_loss)*dz
             fp2 = dIpdz(I_pump_forward[i,j]+fp1/2,   Γ,β_abs_pump[i],n2[j],β_emis_pump[i],fiber_loss)*dz
             fp3 = dIpdz(I_pump_forward[i,j]+fp2/2,   Γ,β_abs_pump[i],n2[j],β_emis_pump[i],fiber_loss)*dz          
@@ -122,8 +108,8 @@ for k = 1:iter_intervals
     end
 
 
-    # Kwowing the pump intensity along the optical fiber we calculate n2 for every z
     for j = 1:z_intervals+1
+    # calculate n2 for every z
         wp = 0
         wa = 0
         we = 0
@@ -139,14 +125,14 @@ for k = 1:iter_intervals
     end
 
     for zj = 1:z_intervals          
-            for λi = 1:λ_intervals+1
+            for i = 1:λ_intervals+1
             # calculate ∫dI(λ,z)dz
-                Rho = h*c/λ[λi]*g[λi]*η*0.5*(1-(1-NA^2)^(1/2))*total_population/τ21
-                fp1 = dIdz(I_forward[λi,zj],          Γ,β_abs[λi],n2[zj],β_emis[λi],fiber_loss,Rho)*dz
-                fp2 = dIdz(I_forward[λi,zj]+fp1/2,    Γ,β_abs[λi],n2[zj],β_emis[λi],fiber_loss,Rho)*dz
-                fp3 = dIdz(I_forward[λi,zj]+fp2/2,    Γ,β_abs[λi],n2[zj],β_emis[λi],fiber_loss,Rho)*dz
-                fp4 = dIdz(I_forward[λi,zj]+fp3,      Γ,β_abs[λi],n2[zj],β_emis[λi],fiber_loss,Rho)*dz
-                I_forward[λi,zj+1] = I_forward[λi,zj]+(fp1+ 2*fp2 + 2*fp3 + fp4)/6
+                Rho = h*c/λ[i]*g[i]*η*0.5*(1-(1-NA^2)^(1/2))*total_population/τ21
+                fp1 = dIdz(I_forward[i,zj],          Γ,β_abs[i],n2[zj],β_emis[i],fiber_loss,Rho)*dz
+                fp2 = dIdz(I_forward[i,zj]+fp1/2,    Γ,β_abs[i],n2[zj],β_emis[i],fiber_loss,Rho)*dz
+                fp3 = dIdz(I_forward[i,zj]+fp2/2,    Γ,β_abs[i],n2[zj],β_emis[i],fiber_loss,Rho)*dz
+                fp4 = dIdz(I_forward[i,zj]+fp3,      Γ,β_abs[i],n2[zj],β_emis[i],fiber_loss,Rho)*dz
+                I_forward[i,zj+1] = I_forward[i,zj]+(fp1+ 2*fp2 + 2*fp3 + fp4)/6
             end
     end 
 
@@ -161,8 +147,8 @@ for k = 1:iter_intervals
     for j = 1:z_intervals
         for i = 1:λ_intervals+1
             # res=dIpdz(Int,Γ,β_abs_pump,n2,fiber_loss)
-            fp1= dIpdz(I_pump_forward[i,j],             Γ,β_abs_pump[i],n2[j],β_emis_pump[i],fiber_loss)*dz
-            fp2= dIpdz(I_pump_forward[i,j]+fp1/2,       Γ,β_abs_pump[i],n2[j],β_emis_pump[i],fiber_loss)*dz
+            fp1= dIpdz(I_pump_forward[i,j],Γ,β_abs_pump[i],n2[j],β_emis_pump[i],fiber_loss)*dz
+            fp2= dIpdz(I_pump_forward[i,j]+fp1/2,Γ,β_abs_pump[i],n2[j],β_emis_pump[i],fiber_loss)*dz
             fp3= dIpdz(I_pump_forward[i,j]+fp2/2,Γ,β_abs_pump[i],n2[j],β_emis_pump[i],fiber_loss)*dz          
             fp4= dIpdz(I_pump_forward[i,j]+fp3,Γ,β_abs_pump[i],n2[j],β_emis_pump[i],fiber_loss)*dz                    
             I_pump_forward[i,j+1] = I_pump_forward[i,j] + ( fp1 + 2*fp2 + 2*fp3 + fp4)/6
@@ -218,8 +204,8 @@ end #time
 
 
 figure()
-plot(λ*1e9, I_forward[:,end], alpha=0.7, linewidth=2)
-plot(λ*1e9, I_backward[:,1], alpha=0.7, linewidth=2)
+plot(λ*1e9, I_forward[:,end],alpha=0.2,linewidth=2)
+plot(λ*1e9, I_backward[:,1],alpha=0.2,linewidth=2)
     xlabel("Wavelength [nm]")
     ylabel("Intensity [W/m²]")
     yscale("log")

@@ -214,13 +214,14 @@ for k = 1:iter_intervals
 
 end
 
-end #time
-
-
+close("all")
 figure()
-plot(λ*1e9, I_forward[:,end], alpha=0.7, linewidth=2)
-plot(λ*1e9, I_backward[:,1], alpha=0.7, linewidth=2)
+plot(λ*1e9, I_forward[:,end], alpha=0.7)
+plot(λ*1e9, I_backward[:,1], alpha=0.7)
     xlabel("Wavelength [nm]")
     ylabel("Intensity [W/m²]")
     yscale("log")
+
+end #time
+
 
