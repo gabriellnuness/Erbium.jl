@@ -36,6 +36,7 @@ using Trapz
 include("rate_equations.jl")
 include("optical_fiber.jl")
 include("spectral_analysis.jl")
+include("physics_constants.jl")
 
 
 

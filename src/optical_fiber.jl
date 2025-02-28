@@ -13,14 +13,16 @@ Set constants according to chosen optical fiber.
 * `total_population`:       Ions population in 1/m³  (Guess!)
 * `η`:                      Fluorescence efficience
 """
-function optical_fiber(fiber::String)
+function optical_fiber(fiber)
 
     # Optical fiber diameter
     if fiber == "m5"
         
         # β = σ⋅NT
         β_abs = readdlm("data/M5_abs.txt",',')
+		β_abs[:,1] = β_abs[:,1] * 1e-9
         β_emis = readdlm("data/M5_emis.txt",',')
+		β_emis[:,1] = β_emis[:,1] * 1e-9
         diameter = ((5.7+6.6) / 2 )*1e-6
         total_population = 2.84e24
         NA = 0.24
