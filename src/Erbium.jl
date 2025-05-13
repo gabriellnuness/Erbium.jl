@@ -26,17 +26,13 @@ export bwMethod, FWHM, Weighted
 
 # 3rd party package functions
 export linear_interpolation
-export trapz
 
 using DelimitedFiles
 using Interpolations
-using Trapz
-
 
 include("rate_equations.jl")
 include("optical_fiber.jl")
 include("spectral_analysis.jl")
-include("physics_constants.jl")
 
 
 

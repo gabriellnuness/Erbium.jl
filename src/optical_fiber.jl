@@ -20,15 +20,19 @@ function optical_fiber(fiber)
         
         # β = σ⋅NT
         β_abs = readdlm("data/M5_abs.txt",',')
-		β_abs[:,1] = β_abs[:,1] * 1e-9
         β_emis = readdlm("data/M5_emis.txt",',')
-		β_emis[:,1] = β_emis[:,1] * 1e-9
         diameter = ((5.7+6.6) / 2 )*1e-6
         total_population = 2.84e24
         NA = 0.24
         τ21 = 10e-3
         τ3 = 1e-6
         η = 0.1
+		Ksigma = 0.85
+		Z0 = 1.15
+		Z = Z0*1.58e-9
+		attenuation =  0.0014 # m⁻¹
+		ϵ1 = 0.1
+		ϵ2 = 0.0080 
 
         return (β_abs, β_emis, τ21, τ3, diameter, NA, total_population, η)
 
@@ -42,6 +46,7 @@ function optical_fiber(fiber)
         τ3 = 10e-3
         NA = 0.24
         η = 0.1
+		Ksigma = 0.9
     
         return (β_abs, β_emis, τ21, τ3, diameter, NA, total_population, η)
         
@@ -63,6 +68,34 @@ function generate_gaussian_spectrum(λ, λc, Δλ, I_peak)
 
     return I_pump
 end
+
+"""
+Pump power by current function
+
+from laser diose characterized (Oclaro)
+"""
+function pump_power_980(current_ampere)
+	power_watt = -0.025+0.65*current_ampere
+	if power_watt < 0 
+		power_watt = 0
+	end
+	return power_watt
+end
+
+"""
+Pump power by current function
+
+from laser diose characterized (Fitel)
+"""
+function pump_power_1480(current_ampere)
+	power_watt =  -0.009 + 0.153*current_ampere
+	if power_watt < 0 
+		power_watt = 0
+	end
+	return power_watt
+end
+
+
 
 """
 Distribution of intensity inside optical fiber
