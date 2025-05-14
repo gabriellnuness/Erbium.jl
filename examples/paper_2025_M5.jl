@@ -1,3 +1,4 @@
+using Erbium
 using DelimitedFiles
 using Interpolations
 using PyPlot
@@ -38,11 +39,11 @@ PyPlot.pygui(true)
 
 
 # include("../src/fiber_data.jl")
-include("../src/core_integrator.jl")
+# include("../src/core_integrator.jl")
 
 
 
-
+@time begin
 """
 980 100 mA
 
@@ -50,7 +51,6 @@ include("../src/core_integrator.jl")
 pumping 980
 """
 FC = 1
-L = 8.5
 currents_980 = [0;50;100;150;200;250;300;400;500]*1e-3
 
 # initialize variables for for-loop
@@ -61,10 +61,24 @@ mean_wavelength_980_f=zeros(size(currents_980))
 bw_980_f=zeros(size(currents_980))
 bw_980_b=zeros(size(currents_980))
 
+fiber_parameters = (RL_980 = 0.0,
+					RL_1480 = 0.3,
+					R0_980 = 0.0,
+					R0_1480 = 0.0,
+					T = 273+27,
+					Ksigma = 0.85,
+					Z= 1.29e-9,
+					ϵ1=0.1,
+					ϵ2=0.0159,
+					gama = 0.01,
+					G = 1.0,
+					L = 8.5
+					)
+
 for (index, current) in enumerate(currents_980)
 	println("\n\n sweeping 980: $(current*1000)mA\n\n")
 	Nc = 75
-	include("../src/fiber_data.jl")
+	# include("../src/fiber_data.jl")
 	input_parameters = (P0_980=pump_power_980(current), P0_1480=pump_power_1480(1000e-3))
 	spectra = test_integrator_single_pass(input_parameters,fiber_parameters)
 	params = test_calc_spec_parameters(spectra.power_forward[Nc:end], spectra.power_backward[Nc:end], spectra.λ[Nc:end])
@@ -98,7 +112,7 @@ plot(currents_980, bw_980_f*1e9)
 """
 pumping 1480
 """
-L = 8.5
+
 currents_1480 = [0;150;200;250;300;400;500;700;1000]*1e-3
 PTF_1480=zeros(size(currents_1480))
 PTB_1480=zeros(size(currents_1480))
@@ -106,8 +120,7 @@ mean_wavelength_1480_b=zeros(size(currents_1480))
 mean_wavelength_1480_f=zeros(size(currents_1480))
 bw_1480_f=zeros(size(currents_1480))
 bw_1480_b=zeros(size(currents_1480))
-I_980 = 0
-I_1480 = 0
+
 
 
 for (index, current) in enumerate(currents_1480)
@@ -329,3 +342,4 @@ end
 #     end
 # end
 
+end

@@ -25,15 +25,15 @@
 # gama = 0.01 # perda da fibra em m^-1
 # G= 1.0  # Fator de sobreposição entre feixe e distribuição de Er na fibra
 
-fiber_parameters = (RL_980 = 0.0,
-					RL_1480 = 0.3,
-					R0_980 = 0.0,
-					R0_1480 = 0.0,
-					T = 273+27,
-					Ksigma = 0.85,
-					Z= 1.29e-9,
-					ϵ1=0.1,
-					ϵ2=0.0159,
-					gama = 0.01,
-					G= 1.0
-					)
+# fiber_parameters = (RL_980 = 0.0,
+# 					RL_1480 = 0.3,
+# 					R0_980 = 0.0,
+# 					R0_1480 = 0.0,
+# 					T = 273+27,
+# 					Ksigma = 0.85,
+# 					Z= 1.29e-9,
+# 					ϵ1=0.1,
+# 					ϵ2=0.0159,
+# 					gama = 0.01,
+# 					G= 1.0
+# 					)

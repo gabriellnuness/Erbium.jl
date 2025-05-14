@@ -8,17 +8,17 @@ Simulação de uma fonte de ASE usando fibra dopada com érbio:
 
 #include("Dados-M12.jl")
 
-function dPdz(P,β12, β21, n2, gama, Rho, λ)
-  _=P*(-β12*(1-n2)+β21*n2-gama)+Rho/λ*β21*n2
-end
+# function dPdz(P,β12, β21, n2, gama, Rho, λ)
+#   _=P*(-β12*(1-n2)+β21*n2-gama)+Rho/λ*β21*n2
+# end
 
-function Integral(A,dl)
-    S=0
-    for i=1:size(A,1)-1
-         S=S+(A[i]+A[i+1])/2*dl
-    end
-    return S   
-end
+# function trapz(A,dl)
+#     S=0
+#     for i=1:size(A,1)-1
+#          S=S+(A[i]+A[i+1])/2*dl
+#     end
+#     return S   
+# end
 
 
 
@@ -130,7 +130,7 @@ function test_integrator_single_pass(input_parameters, fiber_parameters)
 		β21[i]=Ksigma*β12_Max/β21_Max*β21[i]
 	end
 	#####End: Calcular β21 usando aproximação de McCumber ########
-	SS=Integral(β21,dλ)
+	SS=trapz(β21,dλ)
 	Rho=Rho0/SS
 
 	###Begin: Atribuição de valores iniciais ####
@@ -302,12 +302,12 @@ function test_calc_spec_parameters(power_forward, power_backward, λ)
 
 
 	dλ = λ[2]-λ[1]
-	ITf = Integral(power_forward,dλ)  					# ∫ P1480F(λ) dλ 
-	ITb = Integral(power_backward,dλ)     				# ∫ P1480B(λ) dλ 
-	ITlf = Integral(power_forward.*λ,dλ) 		# ∫ λ P1480F(λ) dλ 
-	ITlb = Integral(power_backward.*λ,dλ) 		# ∫ λ P1480B(λ) dλ 
-	ITf2 = Integral(power_forward.*power_forward,dλ) 	# ∫ [P1480F(λ)]² dλ 
-	ITb2 = Integral(power_backward.*power_backward,dλ)  # ∫ [P1480B(λ)]² dλ 
+	ITf = trapz(power_forward,dλ)  					# ∫ P1480F(λ) dλ 
+	ITb = trapz(power_backward,dλ)     				# ∫ P1480B(λ) dλ 
+	ITlf = trapz(power_forward.*λ,dλ) 		# ∫ λ P1480F(λ) dλ 
+	ITlb = trapz(power_backward.*λ,dλ) 		# ∫ λ P1480B(λ) dλ 
+	ITf2 = trapz(power_forward.*power_forward,dλ) 	# ∫ [P1480F(λ)]² dλ 
+	ITb2 = trapz(power_backward.*power_backward,dλ)  # ∫ [P1480B(λ)]² dλ 
 
 	Potf = ITf  				# Potência saída Forward
 	Potb = ITb   				# Potência saída Backward
