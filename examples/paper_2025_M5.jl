@@ -170,7 +170,7 @@ df_100ma = DataFrame(	Current_980=currents_980,
 				Bandwidth_1480_backward=bw_1480_b,
 				Mean_wavelength_1480_forward=mean_wavelength_1480_f,
 				Mean_wavelength_1480_backward=mean_wavelength_1480_b)
-CSV.write("simulaion_dual_pumping_980_100ma.csv", df_100ma)
+# CSV.write("simulaion_dual_pumping_980_100ma.csv", df_100ma)
 
 benchmark_df = CSV.read("benchmark/simulaion_dual_pumping_980_100ma.csv", DataFrame)
 

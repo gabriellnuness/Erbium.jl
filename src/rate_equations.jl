@@ -362,9 +362,10 @@ function test_integrator_single_pass(input_parameters, fiber_parameters)
 
 
 	###Begin: Leituras dos espectros de Absorção, Emissão estimulada e de Bomba
-     data_fiber = readdlm("data/M5_abs.txt", ',') 
-     β13_Interpolate=linear_interpolation(data_fiber[1:580,1], data_fiber[1:580,2])
-     β12_Interpolate = linear_interpolation(data_fiber[581:end,1], data_fiber[581:end,2])
+	package_path = pathof(Erbium)
+	data_fiber = readdlm("package_path/../data/M5_abs.txt", ',') 
+	β13_Interpolate=linear_interpolation(data_fiber[1:580,1], data_fiber[1:580,2])
+	β12_Interpolate = linear_interpolation(data_fiber[581:end,1], data_fiber[581:end,2])
 
 
 	# Os contadores serão associados a 
