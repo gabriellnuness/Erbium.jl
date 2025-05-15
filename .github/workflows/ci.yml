@@ -9,6 +9,7 @@ on:
       - main
       - dev
     tags: '*'
+
 jobs:
   test:
     name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }} - ${{ github.event_name }}
@@ -17,30 +18,43 @@ jobs:
       fail-fast: false
       matrix:
         version:
-          - '1.7' # Replace this with the minimum Julia version that your package supports. E.g. if your package requires Julia 1.5 or higher, change this to '1.5'.
-          - '1' # Leave this line unchanged. '1' will automatically expand to the latest stable 1.x release of Julia.
+          - '1.7'  # Minimum supported Julia version
+          - '1'    # Latest stable 1.x
           - 'nightly'
         os:
           - ubuntu-latest
         arch:
           - x64
+
     steps:
-      - run: python -m pip install -U matplotlib
-      - uses: actions/checkout@v2
+      # Install Python dependencies (if needed)
+      - name: Install Python dependencies
+        run: python -m pip install -U matplotlib
+
+      # Checkout repository (updated to v4)
+      - uses: actions/checkout@v4
+
+      # Setup Julia (keep v1, it's correct)
       - uses: julia-actions/setup-julia@v1
         with:
           version: ${{ matrix.version }}
           arch: ${{ matrix.arch }}
-      - uses: actions/cache@v1
+
+      # Cache Julia artifacts (updated to v3)
+      - uses: actions/cache@v3
         env:
           cache-name: cache-artifacts
         with:
-          path: ~/.julia/artifacts
-          key: ${{ runner.os }}-test-${{ env.cache-name }}-${{ hashFiles('**/Project.toml') }}
+          path: |
+            ~/.julia/artifacts
+            ~/.julia/compiled  # Added for better caching
+            ~/.julia/packages  # Added for better caching
+          key: ${{ runner.os }}-julia-${{ matrix.version }}-${{ env.cache-name }}-${{ hashFiles('**/Project.toml') }}
           restore-keys: |
-            ${{ runner.os }}-test-${{ env.cache-name }}-
-            ${{ runner.os }}-test-
-            ${{ runner.os }}-
+            ${{ runner.os }}-julia-${{ matrix.version }}-${{ env.cache-name }}-
+            ${{ runner.os }}-julia-${{ env.cache-name }}-
+
+      # Standard Julia CI steps (keep these)
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
       - uses: julia-actions/julia-processcoverage@v1
