@@ -1,0 +1,24 @@
+{
+  "title": "Erbium.jl",
+  "description": "Package to simulate the spectrum of  Erbium-doped superfluorescent fiber sources (SFS).",
+  "creators": [
+    {
+      "name": "Gabriel F. S. Nunes",
+      "affiliation": "Aeronautics Institute of Technology (ITA)",
+      "orcid": "0000-0001-6802-1332"
+    },
+    {
+      "name": "Nicolau A. S. Rodrigues",
+      "affiliation": "Institute for Advanced Studies (IEAv)",
+      "orcid": "0000-0002-3173-2381"
+    },
+    {
+      "name": "João M. S. Sakamoto",
+      "affiliation": "Institute for Advanced Studies (IEAv)",
+      "orcid": "0000-0001-5246-5115"
+    }
+  ],
+  "license": "MIT",
+  "keywords": ["julia", "optics", "simulation"],
+  "version": "0.2.0"
+}
