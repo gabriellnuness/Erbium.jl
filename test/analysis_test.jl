@@ -7,7 +7,8 @@ using DelimitedFiles
 ## SLD example
 ##
 ##
-input = readdlm("data\\example_sld_4_74mw.lvm", ',')
+package_path = dirname(dirname(pathof(Erbium)))
+input =readdlm("$(package_path)/data/example_sld_4_74mw.lvm", ',')
 power_dbm = input[:,1]
 λ = input[:,2]
 
@@ -41,7 +42,7 @@ ylabel("Power in Watts = Pₒₛₐ")
 ## Erbium example
 ##
 ##
-input = readdlm("data\\example_erbium_4_44mw.lvm", ',')
+input = readdlm("$(package_path)/data/example_erbium_4_44mw.lvm", ',')
 power_dbm = input[:,1]
 λ = input[:,2]
 
