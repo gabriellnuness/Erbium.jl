@@ -1,7 +1,7 @@
 name = "Erbium"
 uuid = "94af3218-a062-4905-b6cb-576bc736053d"
 authors = ["Gabriel Nunes <nunesgfs@gmail.com>"]
-version = "0.1.0"
+version = "0.2.1"
 
 [deps]
 DelimitedFiles = "8bb1440f-4735-579b-a4ab-409b98df4dab"
